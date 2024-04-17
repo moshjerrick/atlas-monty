@@ -4,42 +4,75 @@
 
 #define MAX_LINE_LENGTH 100
 
-int main(int argc, char *argv[]) {
-    if (argc != 2) {
-        fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
-        return EXIT_FAILURE;
-    }
+void op_push(stack_t **stack, unsigned int line_number)
+{
+	stack_t *new = NULL;
 
-    char *filename = argv[1];
-    FILE *file = fopen(filename, "r");
-    if (file == NULL) {
-        fprintf(stderr, "Error: Unable to open file %s\n", filename);
-        return EXIT_FAILURE;
-    }
+	line_number = line_number;
+	new = malloc(sizeof(stack_t));
+	if (new == NULL)
+	{
+		free(var.getl_info);
+		fclose(var.fp_struct);
+		fprintf(stderr, "Error: malloc failed\n");
+		exit(EXIT_FAILURE);
+	}
+	new->n = var.node_data;
 
-    char line[MAX_LINE_LENGTH];
-    int line_number = 0;
+	new->next = *stack;
+	new->prev = NULL;
+	if ((*stack) != NULL)
+	{
+		(*stack)->prev = new;
+	}
 
-    while (fgets(line, sizeof(line), file) != NULL) {
-        line_number++;
-
-        if (line[strlen(line) - 1] == '\n') {
-            line[strlen(line) - 1] = '\0';
-        }
-
-        char *opcode = strtok(line, " ");
-        if (opcode == NULL) {
-            continue;
-        }
+	*stack = new;
+}
 
 
-        printf("Line %d: Opcode: %s\n", line_number, opcode);
-        char *arg = strtok(NULL, " ");
-        if (arg != NULL) {
-            printf("Line %d: Argument: %s\n", line_number, arg);
-        }
-    }
+void op_pall(stack_t **stack, unsigned int line_number)
+{
+	stack_t *printer_aux = *stack;
 
-    fclose(file);
-    return EXIT_SUCCESS;
+	printer_aux = *stack;
+	line_number = line_number;
+
+	while (printer_aux != NULL)
+	{
+		printf("%d\n", printer_aux->n);
+		printer_aux = printer_aux->next;
+	}
+}
+
+void op_pint(stack_t **stack, unsigned int line_number)
+{
+	if ((*stack) == NULL)
+	{
+		fprintf(stderr, "L%d: can't pint, stack empty\n", line_number);
+		free(var.getl_info);
+		fclose(var.fp_struct);
+		handle_dlist_head((*stack));
+		exit(EXIT_FAILURE);
+	}
+
+	printf("%d\n", ((*stack))->n);
+}
+
+
+void op_swap(stack_t **stack, unsigned int line_number)
+{
+	int tmp = 0;
+
+	if ((*stack) == NULL || (*stack)->next == NULL)
+	{
+		fprintf(stderr, "L%d: can't swap, stack too short\n", line_number);
+		free(var.getl_info);
+		fclose(var.fp_struct);
+		handle_dlist_head((*stack));
+		exit(EXIT_FAILURE);
+	}
+
+	tmp = (*stack)->n;
+	(*stack)->n = (*stack)->next->n;
+	(*stack)->next->n = tmp;
 }
