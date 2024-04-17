@@ -16,7 +16,7 @@ void pall(stack_t **stack, unsigned int line_num)
 
 void push(stack_t **stack, unsigned int line_num, int n)
 {
-    stack_t *new, *h = *stack;
+    stack_t *new, = *stack;
 
     new = malloc(sizeof(stack_t));
     if (new == NULL)
