@@ -1,79 +1,78 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "monty.h"
+#include <stdio.h>
+#include <stdio.h>
 
-#define MAX_LINE_LENGTH 100
 
-void op_push(stack_t **stack, unsigned int line_number)
+void pall(stack_t **stack, unsigned int line_num)
 {
-	stack_t *new = NULL;
+	stack_t *h = *stack;
+	(void)line_num;
 
-	line_number = line_number;
-	new = malloc(sizeof(stack_t));
-	if (new == NULL)
+	while (h)
 	{
-		free(var.getl_info);
-		fclose(var.fp_struct);
-		fprintf(stderr, "Error: malloc failed\n");
+		printf("%d\n", h->n);
+		h = h->next;
+	}
+}
+
+void push(stack_t **stack, unsigned int line_num, int n)
+{
+	stack_t *new, *h = *stack;
+
+	if (stack == NULL)
+	{
+		fprintf(stderr, "L%d: usage: push integer", line_num);
 		exit(EXIT_FAILURE);
 	}
-	new->n = var.node_data;
-
-	new->next = *stack;
+	new = malloc(sizeof(stack_t));
+	if (new == NULL)
+		exit(EXIT_FAILURE);
 	new->prev = NULL;
-	if ((*stack) != NULL)
-	{
-		(*stack)->prev = new;
-	}
-
+	new->n = n;
+	new->next = *stack;
+	if (*stack)
+		h->prev = new;
 	*stack = new;
 }
 
-
-void op_pall(stack_t **stack, unsigned int line_number)
+void pop(stack_t **stack, unsigned int line_num)
 {
-	stack_t *printer_aux = *stack;
+	stack_t *h = *stack;
 
-	printer_aux = *stack;
-	line_number = line_number;
-
-	while (printer_aux != NULL)
+	if (!(*stack))
 	{
-		printf("%d\n", printer_aux->n);
-		printer_aux = printer_aux->next;
-	}
-}
-
-void op_pint(stack_t **stack, unsigned int line_number)
-{
-	if ((*stack) == NULL)
-	{
-		fprintf(stderr, "L%d: can't pint, stack empty\n", line_number);
-		free(var.getl_info);
-		fclose(var.fp_struct);
-		handle_dlist_head((*stack));
+		fprintf(stderr, "L%u: can't pop an empty stack\n", line_num);
 		exit(EXIT_FAILURE);
 	}
 
-	printf("%d\n", ((*stack))->n);
+
+	if (h)
+	{
+		*stack = (h)->next;
+		free(h);
+	}
 }
 
 
-void op_swap(stack_t **stack, unsigned int line_number)
+void swap(stack_t **stack, unsigned int line_num)
 {
-	int tmp = 0;
+	stack_t *h = *stack, *ptr;
 
 	if ((*stack) == NULL || (*stack)->next == NULL)
 	{
-		fprintf(stderr, "L%d: can't swap, stack too short\n", line_number);
-		free(var.getl_info);
-		fclose(var.fp_struct);
-		handle_dlist_head((*stack));
+		fprintf(stderr, "L%u: can't swap, stack too short\n", line_num);
 		exit(EXIT_FAILURE);
 	}
 
-	tmp = (*stack)->n;
-	(*stack)->n = (*stack)->next->n;
-	(*stack)->next->n = tmp;
+	if (h && h->next)
+	{
+		ptr = h->next;
+		if (ptr->next)
+			ptr->next->prev = h;
+		h->next = ptr->next;
+		ptr->prev = NULL;
+		ptr->next = h;
+		h->prev = ptr;
+		*stack = ptr;
+	}
 }
